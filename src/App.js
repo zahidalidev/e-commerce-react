@@ -101,7 +101,6 @@ class App extends Component {
         console.log("cart delete error", error.message);
       }
       
-      // console.log("deleted", product);
     }
 
     render() { 
