@@ -12,13 +12,22 @@ import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
-import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 
-import {Link } from "react-router-dom";
+// for side bar
+import clsx from 'clsx';
+import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
+import List from '@material-ui/core/List';
+import Divider from '@material-ui/core/Divider';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import InboxIcon from '@material-ui/icons/MoveToInbox';
 
+import {Link } from "react-router-dom";
+import _ from 'lodash';
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -35,6 +44,7 @@ const useStyles = makeStyles((theme) => ({
   },
   search: {
     position: 'relative',
+    left: 30,
     borderRadius: theme.shape.borderRadius,
     backgroundColor: fade(theme.palette.common.white, 0.15),
     '&:hover': {
@@ -67,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
     transition: theme.transitions.create('width'),
     width: '100%',
     [theme.breakpoints.up('md')]: {
-      width: '20ch',
+      width: '30ch',
     },
   },
   sectionDesktop: {
@@ -82,12 +92,33 @@ const useStyles = makeStyles((theme) => ({
       display: 'none',
     },
   },
+  list: {
+    width: 200,
+  },
+  fullList: {
+    width: 'auto',
+  },
 }));
 
-export default function PrimarySearchAppBar({wishList, cart}) {
+export default function PrimarySearchAppBar({wishList, cart, onProducts, onHandleCatogriesProduct, onHandleSearch, searchedValue, onCurrentUser}) {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  
+  const categories = [];
+  categories.push("All");
+  onProducts.map(product => {
+      if (categories.indexOf(product.type) === -1) {
+          categories.push(product.type)
+      }
+  });
+
+  const [state, setState] = React.useState({
+    top: false,
+    left: false,
+    bottom: false,
+    right: false,
+  });
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -120,12 +151,15 @@ export default function PrimarySearchAppBar({wishList, cart}) {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <Link to="/home/profile/accountDetails">
+        <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      </Link>
     </Menu>
   );
 
   const mobileMenuId = 'primary-search-account-menu-mobile';
+
+  //mobile Menu
   const renderMobileMenu = (
     <Menu
       anchorEl={mobileMoreAnchorEl}
@@ -136,24 +170,36 @@ export default function PrimarySearchAppBar({wishList, cart}) {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
+
       <MenuItem>
-        <IconButton aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="secondary">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Messages</p>
+        <IconButton title="cart" color="inherit" style={{marginTop: -8}}>
+              <Badge badgeContent={cart.length} color="secondary">
+                <Link to={`/home/cart`}>
+                  <ShoppingCartIcon style={{color: "#3f51b5"}} />
+                </Link>
+              </Badge>
+        </IconButton >
+        <Link to={`/home/cart`}>
+          <p style={{marginTop: 8}} >Cart</p>
+        </Link>
       </MenuItem>
+
       <MenuItem>
-        <IconButton aria-label="show 11 new notifications" color="inherit">
-          <Badge badgeContent={11} color="secondary">
-            <NotificationsIcon />
-          </Badge>
+        <IconButton title="Wish List" color="inherit" style={{marginTop: -8}}>
+              <Link to={`/home/wishList`}>
+                <Badge badgeContent={wishList.length} color="secondary">
+                  <FavoriteIcon style={{color: "#3f51b5"}} />
+                </Badge>
+              </Link>
         </IconButton>
-        <p>Notifications</p>
+        <Link to={`/home/wishList`}>   
+          <p style={{marginTop: 8}}>Wish list</p>
+        </Link>
       </MenuItem>
+
       <MenuItem onClick={handleProfileMenuOpen}>
         <IconButton
+          style={{color: '#3f51b5'}}
           aria-label="account of current user"
           aria-controls="primary-search-account-menu"
           aria-haspopup="true"
@@ -161,9 +207,43 @@ export default function PrimarySearchAppBar({wishList, cart}) {
         >
           <AccountCircle />
         </IconButton>
-        <p>Profile</p>
+        <p style={{marginBottom: -3}}>Profile</p>
       </MenuItem>
     </Menu>
+  );
+
+  const toggleDrawer = (anchor, open) => (event) => {
+    if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return;
+    }
+
+    setState({ ...state, [anchor]: open });
+  };
+
+  // side bar menues
+  const list = (anchor) => (
+    <div
+      style={{marginTop: 20}}
+      className={clsx(classes.list, {
+        [classes.fullList]: anchor === 'top' || anchor === 'bottom',
+      })}
+      role="presentation"
+      onClick={toggleDrawer(anchor, false)}
+      onKeyDown={toggleDrawer(anchor, false)}
+    >
+      <List>
+      <Typography style={{marginBottom: 20}} align="center" variant="h5">Categories</Typography>
+      </List>
+      <Divider />
+      <List style={{marginTop: 20}}>
+        {categories.map((text, index) => (
+          <ListItem button key={text} onClick={()=>onHandleCatogriesProduct(text)}>
+            <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
+            <ListItemText primary={text} />
+          </ListItem>
+        ))}
+      </List>
+    </div>
   );
 
   return (
@@ -171,6 +251,8 @@ export default function PrimarySearchAppBar({wishList, cart}) {
       <AppBar position="static">
         <Toolbar>
           <IconButton
+            style={{marginLeft: 5}}
+            onClick={toggleDrawer("left", true)}
             edge="start"
             className={classes.menuButton}
             color="inherit"
@@ -178,14 +260,27 @@ export default function PrimarySearchAppBar({wishList, cart}) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography className={classes.title} variant="h6" noWrap>
-            E-Commerce
-          </Typography>
+          <SwipeableDrawer
+            anchor="left"
+            open={state.left}
+            onClose={toggleDrawer("left", false)}
+            onOpen={toggleDrawer("left", true)}
+          >
+            {list("left")}
+          </SwipeableDrawer>
+          
+          <Link to="/home" style={{marginLeft: 0}}>
+            <Typography className={classes.title} variant="h6" noWrap style={{color: 'white'}}>
+              Home
+            </Typography>
+          </Link>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon />
             </div>
             <InputBase
+              onChange={onHandleSearch}
+              value={searchedValue}
               placeholder="Search…"
               classes={{
                 root: classes.inputRoot,
@@ -196,6 +291,28 @@ export default function PrimarySearchAppBar({wishList, cart}) {
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
+            {/* menu items */}
+              {
+                (_.isEmpty(onCurrentUser) ? <React.Fragment><Link to="/home/login" style={{marginRight: 30, marginTop: 10}}>
+                  <Typography className={classes.title} variant="h6" noWrap style={{color: 'white'}}>
+                    Login
+                  </Typography>
+                  </Link>
+                  <Link to="/home/register" style={{marginRight: 50, marginTop: 10}}>
+                    <Typography className={classes.title} variant="h6" noWrap style={{color: 'white'}}>
+                      Register
+                    </Typography>
+                  
+                  </Link> </React.Fragment> : 
+                    <React.Fragment>
+                      <Link to="/home/logout" style={{marginRight: 20, marginTop: 10}}>
+                        <Typography className={classes.title} variant="h6" noWrap style={{color: 'white'}}>
+                          Logout
+                        </Typography>
+                     </Link>
+                  </React.Fragment>
+                )
+              }
 
             {/* shoping cart */}
             <IconButton title="Wish List" color="inherit" style={{marginTop: -8}}>
@@ -206,9 +323,7 @@ export default function PrimarySearchAppBar({wishList, cart}) {
               </Badge>
             </IconButton >
 
-            
-              {/* Wish list */}
-              
+              {/* Wish list */}  
             <IconButton title="Wish List" color="inherit" style={{marginTop: -8}}>
               <Link to={`/home/wishList`}>
                 <Badge badgeContent={wishList.length} color="secondary">
@@ -217,16 +332,19 @@ export default function PrimarySearchAppBar({wishList, cart}) {
               </Link>
             </IconButton>
 
-            <IconButton
+            {!_.isEmpty(onCurrentUser) ?
+              <IconButton
               edge="end"
               aria-label="account of current user"
               aria-controls={menuId}
               aria-haspopup="true"
               onClick={handleProfileMenuOpen}
               color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
+              title={onCurrentUser.fullName}
+              >
+                <AccountCircle />
+              </IconButton> : null
+            }
           </div>
           <div className={classes.sectionMobile}>
             <IconButton

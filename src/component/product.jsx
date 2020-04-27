@@ -15,10 +15,12 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
+import {FacebookShareButton} from "react-share";
 
 
 import {Link } from "react-router-dom";
-import { useAlert } from 'react-alert';
+import StarRatings from "react-star-ratings";
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -46,15 +48,16 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Product({onProduct, onHandleProduct, onHandleWishList, onHandleCart}) {
     
-    const alert = useAlert();
     const classes = useStyles();
 
     const [expanded, setExpanded] = React.useState(false);
+    
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
 
+    
     return (
         
         <div>
@@ -82,27 +85,25 @@ export default function Product({onProduct, onHandleProduct, onHandleWishList, o
                 </Typography>
             </CardContent>
             <CardActions disableSpacing>
-            
+
                 {/* wish list button */}
                 <IconButton aria-label="add to favorites" onClick={()=>{
                         onHandleWishList(onProduct);
-                        alert.show(<div style={{ color: 'white' }}>Product added to wish list</div>, {type: 'success',});
                     }} title="Wish List">
                         <FavoriteIcon />
                 </IconButton>
                 {/* cart button */}
                 <IconButton aria-label="add to cart" onClick={()=>{
                         onHandleCart(onProduct)
-                        alert.show(<div style={{ color: 'white' }}>Product added to cart</div>, {type: 'success',});
                     }} title="shoping cart">
                         <ShoppingCartIcon />
                 </IconButton>
-                {/* added to cart */}
-                <IconButton aria-label="share">
+               {/* share button */}
+                <FacebookShareButton style={{marginTop: -5, marginLeft: 10}} aria-label="share" title="Share on FaceBook" url={"http://mrfixer.pk/"}>
                     <ShareIcon />
-                </IconButton>
+                </FacebookShareButton>
                 {/* order now */}
-                <button onClick={onHandleProduct} className="btn btn-primary btn-sm" style={{marginLeft: 10}}>
+                <button onClick={onHandleProduct} className="btn btn-primary btn-sm" style={{marginLeft: 30}}>
                     <Link style={{fontSize: 15, color: 'white'}} to={`/home/${onProduct.id}`}>Product Detail</Link>
                 </button>
 

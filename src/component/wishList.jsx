@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import CardMedia from '@material-ui/core/CardMedia';
 
+import _ from "lodash";
 
 const useStyles = makeStyles({
   table: {
@@ -36,14 +37,16 @@ const rows = [
   createData('Eclair', 262, 16.0, 24, 6.0),
 ];
 
-export default function AcccessibleTable({onWishList, onHandleDelete}) {
+export default function AcccessibleTable({onWishList, onHandleDelete, onHandleCart, onCurrentUser}) {
   const classes = useStyles();
+
+  if(_.isEmpty(onCurrentUser)) return <h1 style={{marginTop: 200}}>Login to see your Wishlist</h1>;
 
   return (
     <TableContainer component={Paper} style={{marginTop: 100, marginLeft: 100, marginRight: 100, width: '85%'}}>
       <Typography variant='h4' style={{marginBottom: 50}}>My Wish List</Typography>
       <Table className={classes.table} aria-label="caption table">
-        <caption>A basic table example with a caption</caption>
+        <caption>Total Products {onWishList.length}</caption>
         <TableHead>
           <TableRow>
             <TableCell  className={classes.head}></TableCell>
@@ -71,7 +74,7 @@ export default function AcccessibleTable({onWishList, onHandleDelete}) {
                     </Button>
                 </TableCell>
                 <TableCell >   
-                    <Button variant="outlined" color="primary">
+                    <Button variant="outlined" color="primary" onClick={()=>onHandleCart(product)}>
                         Add to Cart
                     </Button>
                 </TableCell>
