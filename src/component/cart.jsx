@@ -80,7 +80,7 @@ export default function AcccessibleTable({onCart, onHandleDelete, onHandleCartIn
                 <TableRow key={i}>
                     <CardMedia
                         className={classes.cover}
-                        image={product.picture}
+                        image={`/${product.picture}`}
                         title="Live from space album cover"
                     />
                     <TableCell style={{paddingRight: 50}} align="right">{product.title}</TableCell>

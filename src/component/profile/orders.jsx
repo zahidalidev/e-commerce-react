@@ -50,7 +50,7 @@ export default function Orders({onOrder}) {
                     <TableRow key={i}>
                         <CardMedia
                             className={classes.cover}
-                            image={product.picture}
+                            image={`/${product.picture}`}
                             title="Live from space album cover"
                         />
                         <TableCell align="right">{product.title}</TableCell>

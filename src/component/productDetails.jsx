@@ -15,7 +15,6 @@ import _ from "lodash";
 import {Link } from "react-router-dom";
 import ReactImageMagnify from 'react-image-magnify';
 
-
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
@@ -32,14 +31,6 @@ const useStyles = makeStyles((theme) => ({
     height: 500,
     marginLeft: 70,
     marginTop: 70,
-    '&:hover': {
-      // msTransform: 'scale(1.2)', 
-      // webkitTransform: 'scale(1.2)', 
-      // transform: 'scale(1.2)', 
-      
-      
-
-    },
   },
 
   bottomSmall: {
@@ -90,6 +81,12 @@ export default function MediaControlCard({onSelectProduct, onHandleCart, onSubmi
   const handleImage = (picture) => {
     setOriginalImage(picture);
   }
+  let devider = 0;
+  if(onSelectProduct.reviews[0].ratings === 0){
+    devider = 1
+  }else{
+    devider = onSelectProduct.reviews[0].ratings;
+  }
   return (
     <React.Fragment>
       <Card elevation={1} className={classes.root}>
@@ -99,13 +96,13 @@ export default function MediaControlCard({onSelectProduct, onHandleCart, onSubmi
                   <ReactImageMagnify {...{
                       smallImage: {
                           alt: 'Wristwatch by Ted Baker London',
-                          src: originalImage,
+                          src: `/${originalImage}`,
                           width: 521,
                           height: 500,
                       },
                       largeImage: {
                           alt: '',
-                          src: originalImage,
+                          src: `/${originalImage}`,
                           width: 1400,  
                           height: 1500,
                       }
@@ -113,14 +110,16 @@ export default function MediaControlCard({onSelectProduct, onHandleCart, onSubmi
                 </span>
               {/* other images */}
               <div className="row" style={{marginRight: -476, marginTop: -21, marginBottom: 52, marginLeft: 58}}  >
-                  {onSelectProduct.pictures.map(picture => 
-                    <div className="col-md-2 d-flex justify-content-start">
+                  {onSelectProduct.pictures.map((picture, i) => 
+                    <div className="col-md-2 d-flex justify-content-start" key={i}>
                         <ButtonBase
+                            key={i}
                             onClick={() => handleImage(picture) }
                         >
                         <CardMedia
+                            key={i}
                             className={classes.bottomSmall}
-                            image={picture}
+                            image={`/${picture}`}
                             title={onSelectProduct.title}
                         />
                         </ButtonBase>
@@ -141,7 +140,7 @@ export default function MediaControlCard({onSelectProduct, onHandleCart, onSubmi
                           <span style={{marginLeft: -280}}>
                             {/* start rating */}
                             <StarRatings
-                                rating={onSelectProduct.reviews[0].totalRating/onSelectProduct.reviews[0].ratings}
+                                rating={onSelectProduct.reviews[0].totalRating/devider}
                                 starRatedColor="#ffb600"
                                 numberOfStars={5}
                                 name='rating'
@@ -168,7 +167,7 @@ export default function MediaControlCard({onSelectProduct, onHandleCart, onSubmi
                           <Typography variant="subtitle1" color="textSecondary"  align="left">
                               Color: 
                               {onSelectProduct.color.map((col, i) => (
-                                <Box component="span" style={{marginLeft: 10}}>
+                                <Box component="span" key={i} style={{marginLeft: 10}}>
                                     <Button style={{border: '1px solid black', backgroundColor: `${col}`, padding: 15}} />
                                 </Box>
                               ))}
@@ -240,8 +239,8 @@ export default function MediaControlCard({onSelectProduct, onHandleCart, onSubmi
               </div>
             
             {/* comments */}
-              {onSelectProduct.reviews[0].comments.map( commentDetails => (
-                    <React.Fragment >
+              {onSelectProduct.reviews[0].comments.map((commentDetails, i) => (
+                    <React.Fragment key={i}>
                         <div className="row" style={{marginTop: 40}}>
                           <div>
                             <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />

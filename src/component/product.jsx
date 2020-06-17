@@ -24,7 +24,9 @@ import StarRatings from "react-star-ratings";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        maxWidth: 340,
+        // width: 270,
+        // height: 370
+        maxWidth: 270,
         maxHeight: 900,
     },
     media: {
@@ -75,7 +77,7 @@ export default function Product({onProduct, onHandleProduct, onHandleWishList, o
             <CardMedia
                 style={{cursor: 'pointer'}}
                 className={classes.media}
-                image={onProduct.picture}
+                image={`/${onProduct.picture}`}
                 title={`Price: ${onProduct.price} Rs`}
             />
             {/* product price */}
@@ -103,8 +105,8 @@ export default function Product({onProduct, onHandleProduct, onHandleWishList, o
                     <ShareIcon />
                 </FacebookShareButton>
                 {/* order now */}
-                <button onClick={onHandleProduct} className="btn btn-primary btn-sm" style={{marginLeft: 30}}>
-                    <Link style={{fontSize: 15, color: 'white'}} to={`/home/${onProduct.id}`}>Product Detail</Link>
+                <button onClick={onHandleProduct} className="btn btn-primary btn-sm" style={{marginLeft: 20}}>
+                    <Link style={{fontSize: 13, color: 'white'}} to={`/home/${onProduct.id}`}>Details</Link>
                 </button>
 
                 {/* descrption button */}

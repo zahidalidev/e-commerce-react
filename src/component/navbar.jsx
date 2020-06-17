@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -29,9 +29,17 @@ import InboxIcon from '@material-ui/icons/MoveToInbox';
 import {Link } from "react-router-dom";
 import _ from 'lodash';
 
+// const useForceUpdate = () => {
+//   const [value, setValue] = useState(0); // integer state
+//   return () => setValue(value => ++value); // update the state to force render
+// }
+function useForceUpdate(){
+  const [value, setValue] = useState(0); // integer state
+  return () => setValue(value => ++value); // update the state to force render
+}
 const useStyles = makeStyles((theme) => ({
   grow: {
-    flexGrow: 1,
+    flexGrow: 1
   },
   menuButton: {
     marginRight: theme.spacing(2),
@@ -81,6 +89,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   sectionDesktop: {
+    
     display: 'none',
     [theme.breakpoints.up('md')]: {
       display: 'flex',
@@ -96,15 +105,18 @@ const useStyles = makeStyles((theme) => ({
     width: 200,
   },
   fullList: {
+    
     width: 'auto',
   },
 }));
 
-export default function PrimarySearchAppBar({wishList, cart, onProducts, onHandleCatogriesProduct, onHandleSearch, searchedValue, onCurrentUser}) {
+
+export default function PrimarySearchAppBar({wishList, cart, onProducts, onHandleCatogriesProduct, onHandleSearch, searchedValue, onCurrentUser, onVender_id}) {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
-  
+  const forceUpdate = useForceUpdate();
+
   const categories = [];
   categories.push("All");
   onProducts.map(product => {
@@ -205,7 +217,7 @@ export default function PrimarySearchAppBar({wishList, cart, onProducts, onHandl
           aria-haspopup="true"
           color="inherit"
         >
-          <AccountCircle />
+          <AccountCircle style={{solor: '#66fcf1'}} />
         </IconButton>
         <p style={{marginBottom: -3}}>Profile</p>
       </MenuItem>
@@ -245,22 +257,26 @@ export default function PrimarySearchAppBar({wishList, cart, onProducts, onHandl
       </List>
     </div>
   );
-
+const onLocationHome = window.location.pathname;
   return (
     <div className={classes.grow}>
-      <AppBar position="static">
+      <div style={{backgroundColor: '#202833'}} position="static">
         <Toolbar>
-          <IconButton
-            style={{marginLeft: 5}}
+          {onLocationHome === "/home" ? 
+            <IconButton
+            style={{marginLeft: 5, color: '#66fcf1'}}
             onClick={toggleDrawer("left", true)}
             edge="start"
             className={classes.menuButton}
             color="inherit"
             aria-label="open drawer"
-          >
-            <MenuIcon />
-          </IconButton>
-          <SwipeableDrawer
+            >
+              <MenuIcon />
+            </IconButton>
+            :
+            null  
+          }
+            <SwipeableDrawer
             anchor="left"
             open={state.left}
             onClose={toggleDrawer("left", false)}
@@ -269,26 +285,31 @@ export default function PrimarySearchAppBar({wishList, cart, onProducts, onHandl
             {list("left")}
           </SwipeableDrawer>
           
-          <Link to="/home" style={{marginLeft: 0}}>
+          <Link onClick={forceUpdate} to="/home" style={{marginLeft: 0}}>
             <Typography className={classes.title} variant="h6" noWrap style={{color: 'white'}}>
               Home
             </Typography>
           </Link>
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <SearchIcon />
-            </div>
-            <InputBase
-              onChange={onHandleSearch}
-              value={searchedValue}
-              placeholder="Search…"
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput,
-              }}
-              inputProps={{ 'aria-label': 'search' }}
-            />
-          </div>
+          {
+            onLocationHome === "/home" ?
+              <div className={classes.search}>
+                <div className={classes.searchIcon}>
+                  <SearchIcon />
+                </div>
+                <InputBase
+                  onChange={onHandleSearch}
+                  value={searchedValue}
+                  placeholder="Search…"
+                  classes={{
+                    root: classes.inputRoot,
+                    input: classes.inputInput,
+                  }}
+                  inputProps={{ 'aria-label': 'search' }}
+                />
+              </div>
+              :
+              null 
+          }
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
             {/* menu items */}
@@ -309,25 +330,43 @@ export default function PrimarySearchAppBar({wishList, cart, onProducts, onHandl
                         <Typography className={classes.title} variant="h6" noWrap style={{color: 'white'}}>
                           Logout
                         </Typography>
-                     </Link>
-                  </React.Fragment>
+                      </Link>  
+                    </React.Fragment>
                 )
               }
+              {onCurrentUser.isAdmin ?
+                <Link onClick={forceUpdate} to="/home/admin/profile" style={{marginRight: 20, marginTop: 10}}>
+                  <Typography className={classes.title} variant="h6" noWrap style={{color: 'white'}}>
+                    Admin
+                  </Typography>
+                </Link> : null
+              }  
+              {(onVender_id !== null) ?
+                <Link onClick={forceUpdate} to="/home/vendor/profile" style={{marginRight: 20, marginTop: 10}}>
+                  <Typography className={classes.title} variant="h6" noWrap style={{color: 'white'}}>
+                    Vendor
+                  </Typography>
+                </Link> : <Link onClick={forceUpdate} to="/home/register_as_vendor" style={{marginRight: 20, marginTop: 10}}>
+                  <Typography className={classes.title} variant="h6" noWrap style={{color: 'white'}}>
+                    Become Vendor
+                  </Typography>
+                </Link>
+              }  
 
             {/* shoping cart */}
             <IconButton title="Wish List" color="inherit" style={{marginTop: -8}}>
               <Badge badgeContent={cart.length} color="secondary">
-                <Link to={`/home/cart`}>
-                  <ShoppingCartIcon style={{color: "white"}} />
+                <Link onClick={forceUpdate} to={`/home/cart`}>
+                  <ShoppingCartIcon style={{color: "#66fcf1"}} />
                 </Link>
               </Badge>
             </IconButton >
 
               {/* Wish list */}  
             <IconButton title="Wish List" color="inherit" style={{marginTop: -8}}>
-              <Link to={`/home/wishList`}>
+              <Link onClick={forceUpdate} to={`/home/wishList`}>
                 <Badge badgeContent={wishList.length} color="secondary">
-                  <FavoriteIcon style={{color: "white"}} />
+                  <FavoriteIcon style={{color: "#66fcf1"}} />
                 </Badge>
               </Link>
             </IconButton>
@@ -339,10 +378,10 @@ export default function PrimarySearchAppBar({wishList, cart, onProducts, onHandl
               aria-controls={menuId}
               aria-haspopup="true"
               onClick={handleProfileMenuOpen}
-              color="inherit"
+              color="#66fcf1"
               title={onCurrentUser.fullName}
               >
-                <AccountCircle />
+                <AccountCircle style={{color: '#66fcf1'}} />
               </IconButton> : null
             }
           </div>
@@ -358,7 +397,7 @@ export default function PrimarySearchAppBar({wishList, cart, onProducts, onHandl
             </IconButton>
           </div>
         </Toolbar>
-      </AppBar>
+      </div>
       {renderMobileMenu}
       {renderMenu}
     </div>

@@ -12,6 +12,7 @@ import Typography from '@material-ui/core/Typography';
 import CardMedia from '@material-ui/core/CardMedia';
 
 import _ from "lodash";
+import {Link} from "react-router-dom";
 
 const useStyles = makeStyles({
   table: {
@@ -27,26 +28,15 @@ const useStyles = makeStyles({
   },
 });
 
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
 
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-];
-
-export default function AcccessibleTable({onWishList, onHandleDelete, onHandleCart, onCurrentUser}) {
+export default function AllProducts({onProducts, onHandleProductDelete}) {
   const classes = useStyles();
 
-  if(_.isEmpty(onCurrentUser)) return <h1 style={{marginTop: 200}}>Login to see your Wishlist</h1>;
-
   return (
-    <TableContainer component={Paper} style={{marginTop: 100, marginLeft: 100, marginRight: 100, width: '85%'}}>
-      <Typography variant='h4' style={{marginBottom: 50}}>My Wish List</Typography>
+    <TableContainer component={Paper} style={{marginTop: 100, marginRight: 100, width: '85%', paddingRight: 50, marginBottom: 150}}>
+      <Typography variant='h4' style={{marginBottom: 50}}>All Products</Typography>
       <Table className={classes.table} aria-label="caption table">
-        <caption>Total Products {onWishList.length}</caption>
+      <caption>Total Products {onProducts.length}</caption>
         <TableHead>
           <TableRow>
             <TableCell  className={classes.head}></TableCell>
@@ -58,7 +48,7 @@ export default function AcccessibleTable({onWishList, onHandleDelete, onHandleCa
           </TableRow>
         </TableHead>
         <TableBody>
-          {onWishList.map((product, i) => (
+          {onProducts.map((product, i) => (
             <TableRow key={i}>
                 <CardMedia
                     className={classes.cover}
@@ -69,14 +59,16 @@ export default function AcccessibleTable({onWishList, onHandleDelete, onHandleCa
                 <TableCell align="right">{product.price}</TableCell>
                 <TableCell align="right">{product.stock}</TableCell>
                 <TableCell style={{paddingLeft: 80}}>  
-                    <Button variant="outlined" color="secondary" onClick={()=>onHandleDelete(product)} >
+                    <Button variant="outlined" color="secondary" onClick={()=>onHandleProductDelete(product)} >
                         Delete
                     </Button>
                 </TableCell>
                 <TableCell >   
-                    <Button variant="outlined" color="primary" onClick={()=>onHandleCart(product)}>
-                        Add to Cart
-                    </Button>
+                    <Link to={`/home/admin/products/${product.id}`}>
+                        <Button variant="outlined" color="primary">
+                            Edit
+                        </Button>
+                    </Link>
                 </TableCell>
             </TableRow>
           ))}
@@ -85,3 +77,4 @@ export default function AcccessibleTable({onWishList, onHandleDelete, onHandleCa
     </TableContainer>
   );
 }
+
