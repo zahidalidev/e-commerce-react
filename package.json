@@ -16,7 +16,7 @@
     "express": "^4.17.1",
     "font-awesome": "^4.7.0",
     "joi-browser": "^13.4.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^2.2.0",
     "jwt-simple": "^0.5.6",
     "lodash": "^4.17.15",
